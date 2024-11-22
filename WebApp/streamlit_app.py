@@ -2,121 +2,127 @@ import numpy as np
 import pickle
 import time
 import streamlit as st
+from PIL import Image
 
+# Load the saved model
+loaded_model = pickle.load(open('./final_model.sav', 'rb'))
 
-# loading the saved model
-loaded_model = pickle.load(open('/content/final_model.sav', 'rb'))
+# Function for Prediction
+@st.cache_data(persist=True)
+def predict_fraud(card1, card2, card4, card6, addr1, addr2, TransactionAmt, P_emaildomain, ProductCD, DeviceType):
+    input_data = np.array([[card1, card2, card4, card6, addr1, addr2, TransactionAmt, P_emaildomain, ProductCD, DeviceType]])
+    prediction = loaded_model.predict_proba(input_data)
+    pred = '{0:.{1}f}'.format(prediction[0][0], 2)
+    return float(pred)
 
-
-
-
-# creating a function for Prediction
-
-@st.cache(persist=True)
-def predict_fraud(card1,card2,card4,card6,addr1,addr2,TransactionAmt,P_emaildomain,ProductCD,DeviceType):
-  input=np.array([[card1,card2,card4,card6,addr1,addr2,TransactionAmt,P_emaildomain,ProductCD,DeviceType]])
-
-  prediction=loaded_model.predict_proba(input)
-  pred='{0:.{1}f}'.format(prediction[0][0], 2)
-  return float(pred)
-
-
-  
+# Main function
 def main():
-  
-  
-  html_temp = """
-        <div style="background-color:#000000 ;padding:10px">
-        <h1 style="color:white;text-align:center;">Financial Transaction Fraud Prediction ML Web App 💰 </h1>
+    # Add custom CSS for styling
+    st.markdown("""
+        <style>
+            @keyframes gradientBackground {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+            body {
+                background: linear-gradient(270deg, #FF7EB3, #65C7F7, #0052D4);
+                background-size: 400% 400%;
+                animation: gradientBackground 15s ease infinite;
+                color: #333;
+                font-family: 'Arial', sans-serif;
+            }
+            .container {
+                max-width: 700px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: rgba(255, 255, 255, 0.9);
+                border-radius: 10px;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .header img {
+                width: 100%; /* Make image take up 100% of the parent width */
+                max-width: 800px; /* Optional: Set a maximum width */
+                height: auto; /* Automatically adjust height to maintain aspect ratio */
+                margin-bottom: 10px;
+                animation: pulse 2s infinite;
+            }
+            .header h1 {
+                color: white; /* White color */
+                font-size: 40px; /* Enlarged font size */
+                font-weight: bold; /* Bold font */
+                text-align: center;
+            }
+            .header p {
+                color: #444;
+                font-size: 16px;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Header Section
+    st.markdown("""
+        <div class="header">
+            <img src="https://financialcrimeacademy.org/wp-content/uploads/2022/05/2-43-1024x576.jpg" alt="App Logo">
+            <h1>Fraudulent Transaction Detection</h1>
+            <p>AI-powered predictions for safer financial transactions</p>
         </div>
-     """
-  st.markdown(html_temp, unsafe_allow_html=True)
- 
-  from PIL import Image
-  image = Image.open('/content/home_banner.PNG')
+    """, unsafe_allow_html=True)
 
-  st.image(image, caption='Impacting the World of Finance and Banking with Artificial Intelligence (AI)')
+    # Centered Input Form
+    # st.markdown('<div class="container">', unsafe_allow_html=True)
+    TransactionAmt = st.number_input("Transaction Amount (USD)", 0, 20000, step=1, key="TransactionAmt")
 
-  # getting the input data from the user
-  st.sidebar.title("Financial Transaction Fraud Prediction System 🕵️")
-  st.sidebar.subheader("Choose the Below Parameters to Predict a Financial Transaction")
+    card1 = st.number_input("Payment Card 1 (USD)", 0, 20000, step=1, key="card1")
+    card2 = st.number_input("Payment Card 2 (USD)", 0, 20000, step=1, key="card2")
+    card4 = st.radio("Card Category", [1, 2, 3, 4], key="card4")
+    st.info("1: Discover | 2: Mastercard | 3: American Express | 4: Visa")
 
-  #TransactionAmt
-  st.sidebar.markdown("### Transaction Amount")
-  TransactionAmt = st.sidebar.number_input("Choose the Transaction Amount in USD",0,20000,step =1)
- 
-  
-  #card1 
-  st.sidebar.markdown("### Payment Card 1")
-  card1 = st.sidebar.number_input("Choose the Payment Card 1 Amount (USD)",0,20000,step = 1)
+    card6 = st.radio("Card Type", [1, 2], key="card6")
+    st.info("1: Credit | 2: Debit")
 
-  #card2 
-  st.sidebar.markdown("### Payment Card 2")
-  card2 = st.sidebar.number_input("Choose the Payment Card 2 Amount (USD)",0,20000,step = 1)
+    addr1 = st.slider("Billing Zip Code", 0, 500, step=1, key="addr1")
+    addr2 = st.slider("Billing Country Code", 0, 100, step=1, key="addr2")
 
-  #card4
-  st.sidebar.markdown("### Payment Card Category")
-  card4 = st.sidebar.radio("Choose the Payment Card Category",[1,2,3,4])
-  st.sidebar.info("1 : Discover | 2 : Mastercard | 3 : American Express | 4 : Visa")
+    P_emaildomain = st.selectbox("Purchaser Email Domain", [0, 1, 2, 3, 4], key="P_emaildomain")
+    st.info("0: Gmail | 1: Outlook | 2: Mail.com | 3: Others | 4: Yahoo")
 
-  #card6
-  st.sidebar.markdown("### Payment Card Type")
-  card6 = st.sidebar.radio("Choose the Payment Card Type",[1,2])
-  st.sidebar.info("1 : Credit | 2 : Debit")
+    ProductCD = st.selectbox("Product Code", [0, 1, 2, 3, 4], key="ProductCD")
+    st.info("0: C | 1: H | 2: R | 3: S | 4: W")
 
-   #addr1
-  st.sidebar.markdown("### Billing Zip Code")
-  addr1 = st.sidebar.slider("Choose the Payment Billing Zip Code",0,500,step =1)
+    DeviceType = st.radio("Device Type", [1, 2], key="DeviceType")
+    st.info("1: Mobile | 2: Desktop")
 
+    st.markdown('</div>', unsafe_allow_html=True)
 
-  #addr2
-  st.sidebar.markdown("### Billing Country Code")
-  addr2 = st.sidebar.slider("Choose the Payment Billing Country Code",0,100,step =1)
- 
-  #P_emaildomain
-  st.sidebar.markdown("### Purchaser Email Domain")
-  P_emaildomain = st.sidebar.selectbox("Choose the Purchaser Email Domain", [0,1,2,3,4])
-  st.sidebar.info("0 : Gmail (Google) | 1 : Outlook (Microsoft)  | 2 : Mail.com | 3 : Others | 4 : Yahoo")
- 
-  #ProductCD
-  st.sidebar.markdown("### Product Code")
-  ProductCD = st.sidebar.selectbox("Choose the Product Code",[0,1,2,3,4])
-  st.sidebar.info("0 : C | 1 : H | 2 : R | 3 : S | 4 : W")
-
-  #DeviceType
-  st.sidebar.markdown("### Device Type")
-  DeviceType = st.sidebar.radio("Choose the Payment Device Type",[1,2])
-  st.sidebar.info("1 : Mobile | 2 : Desktop")
-    
-  
-
-  safe_html = """ 
-    <img src="https://media.giphy.com/media/g9582DNuQppxC/giphy.gif" alt="confirmed" style="width:698px;height:350px;"> 
+    # Safe and Danger Visuals
+    safe_html = """
+        <div class="result-container">
+            <img src="https://i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif" alt="Safe Transaction" style="width: 60%; max-width: 400px; border-radius: 10px;">
+        </div>
+    """
+    danger_html = """
+        <div class="result-container">
+            <img src="https://i.pinimg.com/originals/16/82/8c/16828cec9b85bbb355070bd6e8a49597.gif" alt="Fraudulent Transaction" style="width: 60%; max-width: 400px; border-radius: 10px;">
+        </div>
     """
 
-  danger_html = """  
-    <img src="https://media.giphy.com/media/8ymvg6pl1Lzy0/giphy.gif" alt="cancel" style="width:698px;height:350px;">
-    """
+    # Submit Button
+    if st.button("Predict Transaction Status", key="predict_button", use_container_width=True):
+        output = predict_fraud(card1, card2, card4, card6, addr1, addr2, TransactionAmt, P_emaildomain, ProductCD, DeviceType)
+        final_output = output * 80
+        st.subheader(f"Prediction Score: {final_output:.2f}%")
 
- 
-  # creating a button for Prediction
-   
-  if st.button("Click Here To Predict"):
-    output = predict_fraud(card1,card2,card4,card6,addr1,addr2,TransactionAmt,P_emaildomain,ProductCD,DeviceType)
-    final_output = output * 100
-    st.subheader('Probability Score of Financial Transaction is {}% '.format(final_output))
+        if final_output > 75.0:
+            st.markdown(danger_html, unsafe_allow_html=True)
+            st.error("Alert! This transaction is likely fraudulent.")
+        else:
+            st.markdown(safe_html, unsafe_allow_html=True)
+            st.success("Good news! This transaction appears legitimate.")
 
-    if final_output > 75.0:
-      st.markdown(danger_html, unsafe_allow_html=True)
-      st.error("**OMG! Financial Transaction is Fraud**")
-    else:
-      st.balloons()
-      time.sleep(5)
-      st.balloons()
-      time.sleep(5)
-      st.balloons()
-      st.markdown(safe_html, unsafe_allow_html=True)
-      st.success("**Hurray! Transaction is Legitimate**")
-    
 if __name__ == '__main__':
     main()
