@@ -1,6 +1,5 @@
 import numpy as np
 import pickle
-import time
 import streamlit as st
 from PIL import Image
 
@@ -17,64 +16,57 @@ def predict_fraud(card1, card2, card4, card6, addr1, addr2, TransactionAmt, P_em
 
 # Main function
 def main():
-    # Add custom CSS for styling
+    # Apply custom CSS for styling
     st.markdown("""
         <style>
-            @keyframes gradientBackground {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
             body {
-                background: linear-gradient(270deg, #FF7EB3, #65C7F7, #0052D4);
-                background-size: 400% 400%;
-                animation: gradientBackground 15s ease infinite;
-                color: #333;
+                background: linear-gradient(120deg, #1e3c72, #2a5298);
+                color: white;
                 font-family: 'Arial', sans-serif;
             }
-            .container {
-                max-width: 700px;
-                margin: 0 auto;
-                padding: 20px;
-                background-color: rgba(255, 255, 255, 0.9);
+            .stApp {
+                background: linear-gradient(120deg, #1e3c72, #2a5298);
+                color: white;
+                font-family: 'Arial', sans-serif;
+            }
+            .block-container {
+                padding: 2rem;
+                background: rgba(255, 255, 255, 0.1);
                 border-radius: 10px;
-                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+                box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
             }
-            .header {
-                text-align: center;
-                margin-bottom: 30px;
+            h1, h2, h3, h4, h5, h6 {
+                color: white !important;
             }
-            .header img {
-                width: 100%; /* Make image take up 100% of the parent width */
-                max-width: 800px; /* Optional: Set a maximum width */
-                height: auto; /* Automatically adjust height to maintain aspect ratio */
-                margin-bottom: 10px;
-                animation: pulse 2s infinite;
+            p, label, .stMarkdown {
+                color: #f0f0f0 !important;
             }
-            .header h1 {
-                color: white; /* White color */
-                font-size: 40px; /* Enlarged font size */
-                font-weight: bold; /* Bold font */
-                text-align: center;
-            }
-            .header p {
-                color: #444;
+            .stButton button {
+                background-color: #6a11cb;
+                color: white;
+                border: none;
+                padding: 10px 20px;
                 font-size: 16px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            .stButton button:hover {
+                background-color: #2575fc;
             }
         </style>
     """, unsafe_allow_html=True)
 
     # Header Section
     st.markdown("""
+        
         <div class="header">
-            <img src="https://financialcrimeacademy.org/wp-content/uploads/2022/05/2-43-1024x576.jpg" alt="App Logo">
             <h1>Fraudulent Transaction Detection</h1>
+            <img src="https://financialcrimeacademy.org/wp-content/uploads/2022/05/2-43-1024x576.jpg" height="300" width="450" alt="App Logo">
             <p>AI-powered predictions for safer financial transactions</p>
         </div>
     """, unsafe_allow_html=True)
 
-    # Centered Input Form
-    # st.markdown('<div class="container">', unsafe_allow_html=True)
+    # Input Form Section
     TransactionAmt = st.number_input("Transaction Amount (USD)", 0, 20000, step=1, key="TransactionAmt")
 
     card1 = st.number_input("Payment Card 1 (USD)", 0, 20000, step=1, key="card1")
@@ -96,25 +88,24 @@ def main():
 
     DeviceType = st.radio("Device Type", [1, 2], key="DeviceType")
     st.info("1: Mobile | 2: Desktop")
-
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Safe and Danger Visuals
+   # Safe and Danger Visuals
     safe_html = """
         <div class="result-container">
-            <img src="https://i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif" alt="Safe Transaction" style="width: 60%; max-width: 400px; border-radius: 10px;">
+            <img src="https://i.pinimg.com/originals/e8/06/52/e80652af2c77e3a73858e16b2ffe5f9a.gif" alt="Safe Transaction">
         </div>
     """
     danger_html = """
         <div class="result-container">
-            <img src="https://i.pinimg.com/originals/16/82/8c/16828cec9b85bbb355070bd6e8a49597.gif" alt="Fraudulent Transaction" style="width: 60%; max-width: 400px; border-radius: 10px;">
+            <img src="https://i.pinimg.com/originals/16/82/8c/16828cec9b85bbb355070bd6e8a49597.gif" alt="Fraudulent Transaction">
         </div>
     """
 
     # Submit Button
-    if st.button("Predict Transaction Status", key="predict_button", use_container_width=True):
+    if st.button("Predict Transaction Status", key="predict_button"):
         output = predict_fraud(card1, card2, card4, card6, addr1, addr2, TransactionAmt, P_emaildomain, ProductCD, DeviceType)
-        final_output = output * 80
+        final_output = output * (100)
         st.subheader(f"Prediction Score: {final_output:.2f}%")
 
         if final_output > 75.0:
