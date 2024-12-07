@@ -1,4 +1,4 @@
-# Explainable AI-Driven Financial Transaction Fraud Detection Application using Machine Learning and Deep Neural Networks
+# Financial Transaction Fraud Detection using ML and DNN + XAI
 
 ## Introduction
 Artificial Intelligence (AI) has entered the business mainstream, opening new opportunities to solve the most complex business problems. During the Covid-19 pandemic, the use of online payments skyrocketed, accelerating the shift toward digital transactions using cards and mobile apps instead of cash.
