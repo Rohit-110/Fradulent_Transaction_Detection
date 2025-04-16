@@ -86,10 +86,12 @@ This project implemented an XAI-driven fraud detection system, making prediction
 
 ---
 
-## Group Members:
-Rohit Pandey (IIT2022019)
-Shweta Pandey (IIB2022011)
-Yash Ganeriwal (IIT2022029)
-Priyal Singh (IIT2022076)
-Aditi Gupta (IIT2022011)
+## 👥 Group Members
+
+- **Rohit Pandey** (IIT2022019)  
+- **Shweta Pandey** (IIB2022011)  
+- **Yash Ganeriwal** (IIT2022029)  
+- **Priyal Singh** (IIT2022076)  
+- **Aditi Gupta** (IIT2022011)
+
 
